@@ -138,6 +138,10 @@ namespace SuperShopDataSyncConsole
             magentoProduct.price = product.Price;
             magentoProduct.sku = product.Sku;
             magentoProduct.weight = product.Weight;
+            if (magentoProduct.stock_data == null)
+            {
+                magentoProduct.stock_data = new StockData();
+            }
             magentoProduct.stock_data.qty = product.StockData.Quantity;
         }
 
