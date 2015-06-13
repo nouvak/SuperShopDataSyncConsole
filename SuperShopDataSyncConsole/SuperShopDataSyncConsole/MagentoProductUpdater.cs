@@ -76,7 +76,7 @@ namespace SuperShopDataSyncConsole
                 weight = product.Weight,
                 tax_class_id = 2,
                 type_id = "simple",
-                attribute_set_id = 4, // default
+                attribute_set_id = 4 // default
 
 
 
@@ -107,7 +107,7 @@ namespace SuperShopDataSyncConsole
                 manage_stock = true,
                 is_in_stock = true,
                 qty = product.StockData.Quantity,
-                backorders = BackOrderStatus.NoBackorders,
+                backorders = BackOrderStatus.NoBackorders
 
 
                 //enable_qty_increments = false,
