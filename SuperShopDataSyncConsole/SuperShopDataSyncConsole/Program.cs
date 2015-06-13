@@ -64,20 +64,6 @@ namespace SuperShopDataSyncConsole
                 productDataReader.close();
                 stockDataReader.close();
             }
-
-            //Magento.RestApi.Models.Filter filter = new Magento.RestApi.Models.Filter();
-            //Magento.RestApi.MagentoApiResponse<IList<Magento.RestApi.Models.Product>> response = client.GetProducts(filter).Result;
-            //// The response contains the result or errors
-            //if (!response.HasErrors)
-            //{
-            //    log.Info("REST call succeeded");
-            //    IList<Magento.RestApi.Models.Product> products = response.Result;
-            //    log.Debug("Product returned: " + products);
-            //}
-            //else
-            //{
-            //    log.Error("REST call failed: " + response.ErrorString);
-            //}
         }
     }
 }
