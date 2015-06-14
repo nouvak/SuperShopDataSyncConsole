@@ -47,7 +47,7 @@ namespace SuperShopDataSyncConsole
             Stock stock = null;
             if (dataReader.Read())
             {
-                stock = Stock.fromDbData(dataReader);
+                stock = fromDbData(dataReader);
             }
             else
             {
@@ -55,6 +55,13 @@ namespace SuperShopDataSyncConsole
                 stock.Quantity = 0.0;
             }
             dataReader.Close();
+            return stock;
+        }
+
+        private Stock fromDbData(SqlDataReader dataReader)
+        {
+            Stock stock = new Stock();
+            stock.Quantity = Convert.ToDouble(dataReader["anStock"]);
             return stock;
         }
     }

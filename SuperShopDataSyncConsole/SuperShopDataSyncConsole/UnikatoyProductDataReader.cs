@@ -51,7 +51,7 @@ namespace SuperShopDataSyncConsole
             {
                 if (isProductActive(dataReader))
                 {
-                    UnikatoyProduct product = UnikatoyProduct.fromDbData(dataReader);
+                    UnikatoyProduct product = fromDbData(dataReader);
                     log.Debug("Retrieved product from UnikaToy database: " + product);
                     return product;
                 }
@@ -68,6 +68,25 @@ namespace SuperShopDataSyncConsole
                 anShowInWebCatalogue = (bool)dataReader["_anShowInWebCatalogue"];
             }
             return acActive.ToUpper().Equals("T") && anShowInWebCatalogue;
+        }
+
+        private UnikatoyProduct fromDbData(SqlDataReader dataReader)
+        {
+            UnikatoyProduct product = new UnikatoyProduct();
+            product.PantheonId = dataReader["acIdent"].ToString();
+            product.Sku = dataReader["acCode"].ToString();
+            product.Name = dataReader["acName"].ToString();
+            product.Price = Convert.ToDouble(dataReader["anSalePrice"].ToString());
+            product.ManufacturerSuggestedRetailPrice = Convert.ToDouble(dataReader["anRTPrice"].ToString());
+            product.ShortDescription = dataReader["_acDescriptionShort"].ToString();
+            product.LongDescription = dataReader["_acDescription"].ToString();
+            product.Weight = Convert.ToDouble(dataReader["anDimWeightBrutto"]);
+            product.Category = dataReader["acClassif"].ToString();
+            if (!Convert.IsDBNull(dataReader["acClassif2"]))
+            {
+                product.SubCategory = dataReader["acClassif2"].ToString();
+            }
+            return product;
         }
     }
 }

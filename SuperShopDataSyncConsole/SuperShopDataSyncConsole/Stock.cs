@@ -10,12 +10,5 @@ namespace SuperShopDataSyncConsole
     class Stock
     {
         public double Quantity { get; set; }
-
-        public static Stock fromDbData(SqlDataReader dataReader)
-        {
-            Stock stock = new Stock();
-            stock.Quantity = Convert.ToDouble(dataReader["anStock"]);
-            return stock;
-        }
     }
 }

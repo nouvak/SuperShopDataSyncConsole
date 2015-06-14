@@ -76,8 +76,10 @@ namespace SuperShopDataSyncConsole
                 weight = product.Weight,
                 tax_class_id = 2,
                 type_id = "simple",
-                attribute_set_id = 4 // default
-
+                attribute_set_id = 4, // default
+                msrp_enabled = ManufacturerPriceEnablement.UseConfig,
+                msrp_display_actual_price_type = PriceTypeDisplay.UseConfig,
+                msrp = product.ManufacturerSuggestedRetailPrice
 
 
                 //country_of_manufacture = "BE",
@@ -90,9 +92,6 @@ namespace SuperShopDataSyncConsole
                 //meta_description = product.ShortDescription,
                 //meta_keyword = "meta keyword",
                 //meta_title = "meta title",
-                //msrp = 121.50,
-                //msrp_display_actual_price_type = PriceTypeDisplay.BeforeOrderConfirmation,
-                //msrp_enabled = ManufacturerPriceEnablement.Yes,
                 //news_from_date = DateTime.Now,
                 //news_to_date = DateTime.Now.AddDays(7),
                 //options_container = "container2",
