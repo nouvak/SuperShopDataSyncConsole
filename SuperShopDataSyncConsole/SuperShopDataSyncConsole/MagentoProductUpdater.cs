@@ -56,6 +56,7 @@ namespace SuperShopDataSyncConsole
                 {
                     log.Debug("New product adding succeeded.");
                     magentoProduct.entity_id = response.Result;
+                    setWebsiteToProduct(product, magentoProduct);
                     setCategoryToProduct(product, magentoProduct);
                     addImagesToProduct(product, magentoProduct);
                 }
@@ -142,6 +143,17 @@ namespace SuperShopDataSyncConsole
                 magentoProduct.stock_data = new StockData();
             }
             magentoProduct.stock_data.qty = product.StockData.Quantity;
+        }
+
+        private void setWebsiteToProduct(UnikatoyProduct product, Product magentoProduct)
+        {
+            const int SUPERSHOP_STORE_ID = 1;
+            log.Debug("Setting website to product: " + product);
+            MagentoApiResponse<bool> response = magentoClient.AssignWebsiteToProduct(magentoProduct.entity_id, 1).Result;
+            if (response.HasErrors)
+            {
+                log.Warn("Failed to assign website to product: " + product);
+            }
         }
 
         private void setCategoryToProduct(UnikatoyProduct product, Product magentoProduct)
