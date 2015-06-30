@@ -43,13 +43,14 @@ namespace SuperShopDataSyncConsole
             UnikatoyProductDataReader productDataReader = new UnikatoyProductDataReader(connectionString);
             StockDataReader stockDataReader = new StockDataReader(connectionString);
             MagentoProductUpdater productUpdater = new MagentoProductUpdater(client);
+            UnikatoyProduct product = null;
             try
             {
                 productDataReader.open();
                 stockDataReader.open();
-                UnikatoyProduct product = null;
                 while ((product = productDataReader.read()) != null)
                 {
+                    Console.WriteLine("Transfering product: " + product.Sku);
                     log.Debug("Product: " + product);
                     product.StockData = stockDataReader.getStockForProduct(product.PantheonId);
                     productUpdater.update(product);
@@ -57,7 +58,7 @@ namespace SuperShopDataSyncConsole
             }
             catch (Exception e)
             {
-                log.Error("UnikaToy database to SuperShop data sync failed.", e);
+                log.Error("UnikaToy database to SuperShop data sync failed: product=" + product.ToString(), e);
             }
             finally
             {

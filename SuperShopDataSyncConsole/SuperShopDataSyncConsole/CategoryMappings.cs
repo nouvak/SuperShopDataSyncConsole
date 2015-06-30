@@ -68,7 +68,7 @@ namespace SuperShopDataSyncConsole
         public static int getCategoryId(string category, string subCategory)
         {
             string key = category.Trim();
-            if (subCategory != null)
+            if (subCategory != null && !subCategory.Trim().Equals(""))
             {
                 key += @"\" + subCategory.Trim();
             }
