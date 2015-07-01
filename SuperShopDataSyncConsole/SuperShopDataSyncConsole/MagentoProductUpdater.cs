@@ -24,42 +24,50 @@ namespace SuperShopDataSyncConsole
 
         public void update(UnikatoyProduct product)
         {
-            Product magentoProduct = magentoClient.GetProductBySku(product.Sku).Result.Result;
-            if (magentoProduct != null)
+            try
             {
-                log.Debug("Updating existing product in magento: " + product);
-                updateExistingProduct(product, magentoProduct);
-                MagentoApiResponse<bool> response = magentoClient.UpdateProduct(magentoProduct).Result;
-                if (response.HasErrors)
+                int categoryId = CategoryMappings.getCategoryId(product.Category, product.SubCategory);
+                Product magentoProduct = magentoClient.GetProductBySku(product.Sku).Result.Result;
+                if (magentoProduct != null)
                 {
-                    log.Warn("Product updating failed: " + response.ErrorString);
+                    log.Debug("Updating existing product in magento: " + product);
+                    updateExistingProduct(product, magentoProduct);
+                    MagentoApiResponse<bool> response = magentoClient.UpdateProduct(magentoProduct).Result;
+                    if (response.HasErrors)
+                    {
+                        log.Warn("Product updating failed: " + response.ErrorString);
+                    }
+                    else if (!response.Result)
+                    {
+                        log.Debug("Product updating failed.");
+                    }
+                    else
+                    {
+                        log.Debug("Product updating succeeded.");
+                    }
                 }
-                else if (!response.Result)
-                {
-                    log.Debug("Product updating failed.");
-                } 
                 else
                 {
-                    log.Debug("Product updating succeeded.");
+                    log.Debug("Adding new product to magento: " + product);
+                    magentoProduct = createNewProduct(product);
+                    MagentoApiResponse<int> response = magentoClient.CreateNewProduct(magentoProduct).Result;
+                    if (response.HasErrors)
+                    {
+                        log.Warn(string.Format("New product adding failed: product={0}, error={1} ", product, response.ErrorString));
+                    }
+                    else
+                    {
+                        log.Debug("New product adding succeeded.");
+                        magentoProduct.entity_id = response.Result;
+                        setWebsiteToProduct(product, magentoProduct);
+                        setCategoryToProduct(product, magentoProduct, categoryId);
+                        addImagesToProduct(product, magentoProduct);
+                    }
                 }
             }
-            else
+            catch (Exception e)
             {
-                log.Debug("Adding new product to magento: " + product);
-                magentoProduct = createNewProduct(product);
-                MagentoApiResponse<int> response = magentoClient.CreateNewProduct(magentoProduct).Result;
-                if (response.HasErrors)
-                {
-                    log.Warn(string.Format("New product adding failed: product={0}, error={1} ", product, response.ErrorString));
-                }
-                else
-                {
-                    log.Debug("New product adding succeeded.");
-                    magentoProduct.entity_id = response.Result;
-                    setWebsiteToProduct(product, magentoProduct);
-                    setCategoryToProduct(product, magentoProduct);
-                    addImagesToProduct(product, magentoProduct);
-                }
+                log.Error("Product updating failed: " + e);
             }
         }
 
@@ -149,17 +157,16 @@ namespace SuperShopDataSyncConsole
         {
             const int SUPERSHOP_STORE_ID = 1;
             log.Debug("Setting website to product: " + product);
-            MagentoApiResponse<bool> response = magentoClient.AssignWebsiteToProduct(magentoProduct.entity_id, 1).Result;
+            MagentoApiResponse<bool> response = magentoClient.AssignWebsiteToProduct(magentoProduct.entity_id, SUPERSHOP_STORE_ID).Result;
             if (response.HasErrors)
             {
                 log.Warn("Failed to assign website to product: " + product);
             }
         }
 
-        private void setCategoryToProduct(UnikatoyProduct product, Product magentoProduct)
+        private void setCategoryToProduct(UnikatoyProduct product, Product magentoProduct, int categoryId)
         {
             log.Debug("Setting category to product: " + product);
-            int categoryId = CategoryMappings.getCategoryId(product.Category, product.SubCategory);
             MagentoApiResponse<bool> response = magentoClient.AssignCategoryToProduct(magentoProduct.entity_id, categoryId).Result;
             if (response.HasErrors)
             {

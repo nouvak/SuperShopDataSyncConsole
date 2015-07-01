@@ -1,4 +1,5 @@
 ﻿using log4net;
+using log4net.Config;
 using Magento.RestApi;
 using Magento.RestApi.Models;
 using System;
@@ -15,6 +16,8 @@ namespace SuperShopDataSyncConsole
     {
         private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
+        private const string LOG4NET_CONFIG_FILE = "log4net.config";
+
         private const string UNIKATOY_SERVER = @"192.168.0.5\SIRIUS";
         private const string UNIKATOY_DATABASE = "WEB-PORTAL";
 
@@ -27,6 +30,7 @@ namespace SuperShopDataSyncConsole
                 Console.WriteLine("Usage: SuperShopDataSyncConsole {magento_username} {magento_password} {magento_consumer_key} {magento_consumer_secret} {unikatoy_username} {unikatoy_password}");
                 return;
             }
+            XmlConfigurator.Configure(new System.IO.FileInfo(LOG4NET_CONFIG_FILE));
             log.Info("Synchronizing Magento product data.");
             string magentoUsername = args[0];
             string magentoPassword = args[1];
