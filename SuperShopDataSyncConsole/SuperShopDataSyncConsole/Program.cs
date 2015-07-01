@@ -25,9 +25,9 @@ namespace SuperShopDataSyncConsole
 
         static void Main(string[] args)
         {
-            if (args.Count() != 6)
+            if (args.Count() != 7)
             {
-                Console.WriteLine("Usage: SuperShopDataSyncConsole {magento_username} {magento_password} {magento_consumer_key} {magento_consumer_secret} {unikatoy_username} {unikatoy_password}");
+                Console.WriteLine("Usage: SuperShopDataSyncConsole {magento_username} {magento_password} {magento_consumer_key} {magento_consumer_secret} {unikatoy_username} {unikatoy_password} {image_directory}");
                 return;
             }
             XmlConfigurator.Configure(new System.IO.FileInfo(LOG4NET_CONFIG_FILE));
@@ -38,6 +38,7 @@ namespace SuperShopDataSyncConsole
             string magentoConsumerSecret = args[3];
             string unikatoyUsername = args[4];
             string unikatoyPassword = args[5];
+            string imageDirectory = args[6];
             IMagentoApi client = new MagentoApi()
                 .Initialize(MAGENTO_SUPERSHOP_URL, magentoConsumerKey, magentoConsumerSecret)
                 .AuthenticateAdmin(magentoUsername, magentoPassword);
@@ -46,7 +47,7 @@ namespace SuperShopDataSyncConsole
                 UNIKATOY_SERVER, UNIKATOY_DATABASE, unikatoyUsername, unikatoyPassword);
             UnikatoyProductDataReader productDataReader = new UnikatoyProductDataReader(connectionString);
             StockDataReader stockDataReader = new StockDataReader(connectionString);
-            MagentoProductUpdater productUpdater = new MagentoProductUpdater(client);
+            MagentoProductUpdater productUpdater = new MagentoProductUpdater(client, imageDirectory);
             UnikatoyProduct product = null;
             try
             {

@@ -16,10 +16,12 @@ namespace SuperShopDataSyncConsole
         private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         private IMagentoApi magentoClient;
+        private string productImageDirectory;
 
-        public MagentoProductUpdater(IMagentoApi magentoClient)
+        public MagentoProductUpdater(IMagentoApi magentoClient, string productImageDirectory)
         {
             this.magentoClient = magentoClient;
+            this.productImageDirectory = productImageDirectory;
         }
 
         public void update(UnikatoyProduct product)
@@ -176,33 +178,39 @@ namespace SuperShopDataSyncConsole
 
         private void addImagesToProduct(UnikatoyProduct product, Product magentoProduct)
         {
-            ImageFile imageFile = new ImageFile
+            DirectoryInfo di = new DirectoryInfo(productImageDirectory);
+            FileInfo[] productImageFiles = di.GetFiles(product.PantheonId.Trim() + "*.*");
+            foreach (FileInfo imageFileInfo in productImageFiles)
             {
-                file_content = File.ReadAllBytes(@"C:\Users\marko\Downloads\150000.jpg"),
-                file_mime_type = "image/jpeg",
-                file_name = "150000"
-            };
-            MagentoApiResponse<int> responseAddImage = magentoClient.AddImageToProduct(magentoProduct.entity_id, imageFile).Result;
-            if (responseAddImage.HasErrors)
-            {
-                log.Warn(string.Format("Failed to add image to product: product={0}, error={1}", product, responseAddImage.ErrorString));
-                return;
-            }
-            int imageId = responseAddImage.Result;
-            MagentoApiResponse<ImageInfo> responseImageInfo = magentoClient.GetImageInfoForProduct(magentoProduct.entity_id, imageId).Result;
-            if (responseImageInfo.HasErrors)
-            {
-                log.Warn(string.Format("Failed to retrieve image info of product: product={0}, error={1}", product, responseImageInfo.ErrorString));
-                return;
-            }
-            ImageInfo imageInfo = responseImageInfo.Result;
-            imageInfo.types.Add(ImageType.image);
-            imageInfo.types.Add(ImageType.small_image);
-            imageInfo.types.Add(ImageType.thumbnail);
-            MagentoApiResponse<bool> responseUpdateImageInfo = magentoClient.UpdateImageInfoForProduct(magentoProduct.entity_id, imageId, imageInfo).Result;
-            if (responseUpdateImageInfo.HasErrors)
-            {
-                log.Warn(string.Format("Failed to update image info of product: product={0}, error={1}", product, responseUpdateImageInfo.ErrorString));
+                string test = imageFileInfo.FullName;
+                ImageFile imageFile = new ImageFile
+                {
+                    file_content = File.ReadAllBytes(imageFileInfo.FullName),
+                    file_mime_type = "image/jpeg",
+                    file_name = Path.GetFileNameWithoutExtension(imageFileInfo.Name)
+                };
+                MagentoApiResponse<int> responseAddImage = magentoClient.AddImageToProduct(magentoProduct.entity_id, imageFile).Result;
+                if (responseAddImage.HasErrors)
+                {
+                    log.Warn(string.Format("Failed to add image to product: product={0}, error={1}", product, responseAddImage.ErrorString));
+                    return;
+                }
+                int imageId = responseAddImage.Result;
+                MagentoApiResponse<ImageInfo> responseImageInfo = magentoClient.GetImageInfoForProduct(magentoProduct.entity_id, imageId).Result;
+                if (responseImageInfo.HasErrors)
+                {
+                    log.Warn(string.Format("Failed to retrieve image info of product: product={0}, error={1}", product, responseImageInfo.ErrorString));
+                    return;
+                }
+                ImageInfo imageInfo = responseImageInfo.Result;
+                imageInfo.types.Add(ImageType.image);
+                imageInfo.types.Add(ImageType.small_image);
+                imageInfo.types.Add(ImageType.thumbnail);
+                MagentoApiResponse<bool> responseUpdateImageInfo = magentoClient.UpdateImageInfoForProduct(magentoProduct.entity_id, imageId, imageInfo).Result;
+                if (responseUpdateImageInfo.HasErrors)
+                {
+                    log.Warn(string.Format("Failed to update image info of product: product={0}, error={1}", product, responseUpdateImageInfo.ErrorString));
+                }
             }
         }
     }
