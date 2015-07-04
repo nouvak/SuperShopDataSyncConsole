@@ -144,7 +144,14 @@ namespace SuperShopDataSyncConsole
         {
             magentoProduct.name = product.Name;
             magentoProduct.description = product.LongDescription;
-            magentoProduct.short_description = product.ShortDescription;
+            if (string.IsNullOrEmpty(product.ShortDescription))
+            {
+                magentoProduct.short_description = product.LongDescription;
+            }
+            else
+            {
+                magentoProduct.short_description = product.ShortDescription;
+            }
             magentoProduct.price = product.Price;
             magentoProduct.sku = product.Sku;
             magentoProduct.weight = product.Weight;
